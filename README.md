@@ -11,10 +11,31 @@ Pokemon Red Gymnasium environment for reinforcement learning
 pip install -e . 
 ```
 
+### Platform Support
+
+This environment supports:
+- **Linux** (Primary platform)
+- **macOS** 
+- **Windows** (Full compatibility added)
+
+All path handling, compilation flags, and system calls have been made cross-platform compatible.
+
 ### Running
 
+#### Cross-platform (Recommended)
+```sh
+python run.py
+```
+
+#### Platform-specific
+**Linux/macOS:**
 ```sh
 ./run.sh
+```
+
+**Windows:**
+```cmd
+run.bat
 ```
 
 ### Structure

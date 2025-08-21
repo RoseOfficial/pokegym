@@ -28,7 +28,7 @@ from .utils.story_manager import Story
 from .utils.events import (EventFlags, EVENTS)
 
 
-STATE_PATH = __file__.rstrip("Pokegym.py") + "States/"
+STATE_PATH = str(Path(__file__).parent / "States")
 CUT_GRASS_SEQ = deque([(0x52, 255, 1, 0, 1, 1), (0x52, 255, 1, 0, 1, 1), (0x52, 1, 1, 0, 1, 1)])
 CUT_FAIL_SEQ = deque([(-1, 255, 0, 0, 4, 1), (-1, 255, 0, 0, 1, 1), (-1, 255, 0, 0, 1, 1)])
 CUT_SEQ = [((0x3D, 1, 1, 0, 4, 1), (0x3D, 1, 1, 0, 1, 1)), ((0x50, 1, 1, 0, 4, 1), (0x50, 1, 1, 0, 1, 1)),]
@@ -45,7 +45,7 @@ class Pokegym:
         if rom_path is None or not os.path.exists(rom_path):
             raise FileNotFoundError("No ROM file found in the specified directory.")
         if state_path is None:
-            state_path = STATE_PATH +  "Bulbasaur.state" # STATE_PATH + "has_pokedex_nballs.state"
+            state_path = str(Path(STATE_PATH) / "Bulbasaur.state") # STATE_PATH + "has_pokedex_nballs.state"
         self.game, self.screen = make_env(rom_path, headless, **kwargs)
         self.initial_states = [open_state_file(state_path)]
         self.headless = headless
@@ -89,7 +89,7 @@ class Pokegym:
         self.action_space = spaces.Discrete(len(ACTIONS))
         load_pyboy_state(self.game, self.load_last_state())
         self.env_id = env_id
-        self.s_path = Path(f"videos/{self.env_id}")
+        self.s_path = Path("videos") / str(self.env_id)
         
         # Misc
         self.last_reward = None
@@ -267,7 +267,7 @@ class Pokegym:
 
     def save_to_database(self):
         db_dir = self.db_path
-        conn = sqlite3.connect(f'{db_dir}/{db_name}.db')
+        conn = sqlite3.connect(str(db_dir / f'{db_name}.db'))
         cursor = conn.cursor()
 
         cursor.execute("CREATE TABLE IF NOT EXISTS Pokegym (env_id TEXT PRIMARY KEY,hm_count INTEGER,cut INTEGER)")
@@ -278,7 +278,7 @@ class Pokegym:
 
     def read_database(self):
         db_dir = self.db_path
-        conn = sqlite3.connect(f'{db_dir}/{db_name}.db')
+        conn = sqlite3.connect(str(db_dir / f'{db_name}.db'))
         cursor = conn.cursor()
 
         cursor.execute("SELECT COUNT(*) FROM Pokegym WHERE cut = 1")

@@ -28,6 +28,9 @@ VERSION = "2.0.6"
 # Build with DEBUG=1 to enable debug symbols
 DEBUG = os.getenv("DEBUG", "0") == "1"
 
+# Detect system first
+system = platform.system()
+
 # Put full paths to Cython extension here
 # Note we are trying to move away from Cython,
 # because our C envs are lighter weigh and
@@ -43,45 +46,74 @@ extra_compile_args = [
     '-DPLATFORM_DESKTOP',
 ]
 extra_link_args = [
-    '-fwrapv'
+    '-fwrapv' if system != 'Windows' else ''
 ]
+# Remove empty strings
+extra_link_args = [arg for arg in extra_link_args if arg]
+
 cxx_args = [
-    '-fdiagnostics-color=always',
+    '-fdiagnostics-color=always' if system != 'Windows' else ''
 ]
+# Remove empty strings
+cxx_args = [arg for arg in cxx_args if arg]
+
 nvcc_args = []
 
 if DEBUG:
-    extra_compile_args += [
-        '-O0',
-        '-g',
-        '-fsanitize=address,undefined,bounds,pointer-overflow,leak',
-    ]
-    extra_link_args += [
-        '-g',
-    ]
-    cxx_args += [
-        '-O0',
-        '-g',
-    ]
+    if system == 'Windows':
+        extra_compile_args += [
+            '/Od',  # Disable optimization
+            '/Zi',  # Debug info
+        ]
+        extra_link_args += [
+            '/DEBUG',
+        ]
+        cxx_args += [
+            '/Od',
+            '/Zi',
+        ]
+    else:
+        extra_compile_args += [
+            '-O0',
+            '-g',
+            '-fsanitize=address,undefined,bounds,pointer-overflow,leak',
+        ]
+        extra_link_args += [
+            '-g',
+        ]
+        cxx_args += [
+            '-O0',
+            '-g',
+        ]
     nvcc_args += [
         '-O0',
         '-g',
     ]
 else:
-    extra_compile_args += [
-        '-O2',
-    ]
-    extra_link_args += [
-        '-O2',
-    ]
-    cxx_args += [
-        '-O3',
-    ]
+    if system == 'Windows':
+        extra_compile_args += [
+            '/O2',  # Optimize for speed
+        ]
+        extra_link_args += [
+            # Release mode doesn't need special flags
+        ]
+        cxx_args += [
+            '/O2',
+        ]
+    else:
+        extra_compile_args += [
+            '-O2',
+        ]
+        extra_link_args += [
+            '-O2',
+        ]
+        cxx_args += [
+            '-O3',
+        ]
     nvcc_args += [
         '-O3',
     ]
 
-system = platform.system()
 if system == 'Linux':
     extra_compile_args += [
         '-Wno-alloc-size-larger-than',
@@ -97,6 +129,15 @@ elif system == 'Darwin':
         '-framework', 'Cocoa',
         '-framework', 'OpenGL',
         '-framework', 'IOKit',
+    ]
+elif system == 'Windows':
+    # Windows-specific compile and link args
+    extra_compile_args += [
+        '/W3',  # Warning level 3
+        '/EHsc',  # Exception handling
+    ]
+    extra_link_args += [
+        # Windows doesn't need special linking flags for this project
     ]
 else:
     raise ValueError(f'Unsupported system: {system}')
