@@ -17,7 +17,7 @@ def env_creator(name='pokemon_red', env_config=None):
 def make(name, env_config, headless: bool = True, state_path=None, buf=None):
     '''Pokemon Red'''
     env = Pokegym(env_config, headless=headless, state_path=state_path)
-    env = StreamWrapper(env, stream_metadata = {"user": f"leanke@dev_test\n",})
+    env = StreamWrapper(env, stream_metadata = {"user": f"RoseOfficial\n",})
     return pufferlib.emulation.GymnasiumPufferEnv(env=env, buf=buf)
 
 class RenderWrapper(gymnasium.Wrapper):

@@ -34,10 +34,11 @@ CUT_FAIL_SEQ = deque([(-1, 255, 0, 0, 4, 1), (-1, 255, 0, 0, 1, 1), (-1, 255, 0,
 CUT_SEQ = [((0x3D, 1, 1, 0, 4, 1), (0x3D, 1, 1, 0, 1, 1)), ((0x50, 1, 1, 0, 4, 1), (0x50, 1, 1, 0, 1, 1)),]
 db_name = Path(f'{str(uuid.uuid4())[:4]}')
 
-class Pokegym:
+class Pokegym(Env):
     counter_lock = multiprocessing.Lock()
     counter = multiprocessing.Value('i', 0)
     def __init__(self, env_config, rom_path="pokemon_red.gb", state_path=None, headless=True, quiet=False, verbose=False, **kwargs,):
+        super().__init__()
         with Pokegym.counter_lock:
             env_id = Pokegym.counter.value
             Pokegym.counter.value += 1
